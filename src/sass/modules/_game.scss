@@ -1,0 +1,18 @@
+.game__field {
+  .game__cell {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .game__spot {
+    background-color: bisque;
+    border-radius: 50%;
+    animation: dissapear;
+    animation-fill-mode: forwards;
+  }
+  .game__hero {
+    position: absolute;
+    background-color: red;
+  }
+}
