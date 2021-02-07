@@ -6,19 +6,19 @@ import '../sass/style.scss';
 
 
 const keysMovement = {
-  'ArrowUp': {x: 0, y: -1},
-  'ArrowDown': {x: 0, y: 1},
-  'ArrowRight': {x: 1, y: 0},
-  'ArrowLeft': {x: -1, y: 0}
+  'ArrowUp': {r: -1, c: 0},
+  'ArrowDown': {r: 1, c: 0},
+  'ArrowRight': {r: 0, c: 1},
+  'ArrowLeft': {r: 0, c: -1}
 }
 
 class GameComponent extends Component {
   constructor() {
     super();
-    this.size = {x:12, y:8}
-    this.game = new Game(this.size, 0.7, 15, {x: this.size.x - 1, y: 0}, this.reset.bind(this));
+    this.size = {r:8, c:12}
+    this.game = new Game(this.size, 0.7, 15, {r: 0, c: this.size.c - 1}, this.reset.bind(this));
     this.width = document.querySelector('#main').clientWidth;
-    this.cellSize = this.width / this.size.x;
+    this.cellSize = this.width / this.size.c;
     console.log(this.cellSize);
     console.log(this.game);
     this.state = {

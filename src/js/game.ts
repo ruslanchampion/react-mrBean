@@ -1,24 +1,24 @@
 class Game {
-  size: { x: number, y: number }
+  size: { r: number, c: number }
   area: number
   grid: Array<Array<number>>
   emptyCells: Array<number>
   filledCells: Array<number>
   fillDensity: number
   lifeSpan: number
-  heroPos: { x: number, y: number }
-  winPos: { x: number, y: number }
+  heroPos: { r: number, c: number }
+  winPos: { r: number, c: number }
   heroClass: string
   isActive: boolean
   onChange: () => void
 
-  constructor(size: { x: number, y: number },
+  constructor(size: { r: number, c: number },
     fillDensity: number,
     lifeSpan: number,
-    winPos: { x: number, y: number },
+    winPos: { r: number, c: number },
     onChange: () => void) {
     this.size = size;
-    this.area = size.x * size.y;
+    this.area = size.r * size.c;
     this.lifeSpan = lifeSpan;
     this.fillDensity = fillDensity;
     this.isActive = true;
@@ -27,20 +27,20 @@ class Game {
     this.generateGrid();
     console.log(this.emptyCells);
     this.fillGrid();
-    this.heroPos = { x: 0, y: this.size.y - 1 };
+    this.heroPos = { r: this.size.r - 1, c: 0 };
     this.heroClass = 'game__hero';
   }
 
-  move(vec: { x: number, y: number }) {
+  move(vec: { r: number, c: number }) {
     if (this.isActive) {
       const newPos = {
-        x: vec.x + this.heroPos.x,
-        y: vec.y + this.heroPos.y
+        r: vec.r + this.heroPos.r,
+        c: vec.c + this.heroPos.c
       }
-      if (((newPos.x < this.size.x) && (newPos.x >= 0)) &&
-        ((newPos.y < this.size.y) && (newPos.y >= 0))) {
-        this.heroPos.x = newPos.x;
-        this.heroPos.y = newPos.y;
+      if (((newPos.r < this.size.r) && (newPos.r >= 0)) &&
+        ((newPos.c < this.size.c) && (newPos.c >= 0))) {
+        this.heroPos.r = newPos.r;
+        this.heroPos.c = newPos.c;
       }
       this.checkIfDead();
       this.checkIfWin();
@@ -49,7 +49,7 @@ class Game {
   }
 
   checkIfDead() {
-    if (this.grid[this.heroPos.x][this.heroPos.y] === 0) {
+    if (this.grid[this.heroPos.r][this.heroPos.c] === 0) {
       this.isActive = false;
       const className = `${this.heroClass} ${this.heroClass}--dead`;
       this.heroClass = className;
@@ -58,7 +58,7 @@ class Game {
   }
 
   checkIfWin() {
-    if ((this.heroPos.x === this.winPos.x) && (this.heroPos.y === this.winPos.y)) {
+    if ((this.heroPos.r === this.winPos.r) && (this.heroPos.c === this.winPos.c)) {
       this.isActive = false;
       const className = `${this.heroClass} ${this.heroClass}--win`;
       this.heroClass = className;
@@ -67,30 +67,30 @@ class Game {
   }
 
   keyToCoord(key: number) {
-    return [(key - (Math.floor(key / this.size.x) * this.size.x)), (Math.floor(key / this.size.x))]
+    return [(Math.floor(key / this.size.c)), (key - (Math.floor(key / this.size.c) * this.size.c))]
   }
 
   coordToKey(coord: Array<number>) {
-    return (coord[0] + (coord[1] * this.size.x))
+    return (coord[1] + (coord[0] * this.size.c))
   }
 
   generateGrid() {
-    this.grid = Array.from(Array(this.size.x))
-      .map((itm) => Array.from(Array(this.size.y))
+    this.grid = Array.from(Array(this.size.r))
+      .map((itm) => Array.from(Array(this.size.c))
         .map((itm) => 0))
-    this.emptyCells = this.grid.reduce((acc, itm, idxX) => {
-      acc = acc.concat(itm.reduce((acc, itm, idxY) => {
+    this.emptyCells = this.grid.reduce((acc, itm, r) => {
+      acc = acc.concat(itm.reduce((acc, itm, c) => {
         if (itm === 0) {
-          acc.push(idxX + (idxY * this.size.x))
+          acc.push(c + (r * this.size.c))
         }
         return acc
       }, []))
       return acc
     }, [])
-    this.filledCells = this.grid.reduce((acc, itm, idxX) => {
-      acc = acc.concat(itm.reduce((acc, itm, idxY) => {
+    this.filledCells = this.grid.reduce((acc, itm, r) => {
+      acc = acc.concat(itm.reduce((acc, itm, c) => {
         if (itm === 1) {
-          acc.push(idxX + (idxY * this.size.x))
+          acc.push(c + (r * this.size.c))
         }
         return acc
       }, []))
@@ -100,16 +100,16 @@ class Game {
 
   fillGrid() {
     this.spawnPermanentSpot(this.winPos);
-    this.spawnSpot(1, this.coordToKey([0, this.size.y - 1]));
+    this.spawnSpot(1, this.coordToKey([this.size.r - 1, 0]));
     console.log(this.grid);
     while (this.filledCells.length < this.fillDensity * this.area) {
       this.spawnSpot(1 - (Math.random() * 0.8));
     }
   }
 
-  spawnPermanentSpot(pos: { x: number, y: number }) {
-    this.grid[pos.x][pos.y] = 2;
-    const key = this.coordToKey([pos.x, pos.y]);
+  spawnPermanentSpot(pos: { r: number, c: number }) {
+    this.grid[pos.r][pos.c] = 2;
+    const key = this.coordToKey([pos.r, pos.c]);
     let idx = this.filledCells.indexOf(key);
     if (idx >= 0) {
       this.filledCells.splice(idx, 1);
@@ -145,11 +145,8 @@ class Game {
       const timeToRespawn = ((size * this.lifeSpan) + (Math.random() * this.lifeSpan * 0.5) * ((Math.random() < 0.5) ? -1 : 1)) * 1000;
       setTimeout(() => this.spawnSpot(1), (size * this.lifeSpan) * 1000);
       this.onChange();
-
     }
   }
-
-
 }
 
 export default Game;

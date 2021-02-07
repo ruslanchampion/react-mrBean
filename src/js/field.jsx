@@ -48,8 +48,8 @@ class FieldComponent extends Component {
   }
 
   generateField() {
-    return this.props.game.grid.map((col, idxX) =>
-      col.map((cell, idxY) =>
+    return this.props.game.grid.map((row, idxY) =>
+      row.map((cell, idxX) =>
         <div className='game__cell' key={`${idxX},${idxY}`}
           style={{
             width: `${this.props.cellSize}px`,
@@ -58,7 +58,7 @@ class FieldComponent extends Component {
             left: `${(idxX * this.props.cellSize)}px`
           }}>
           {this.generateSpot(cell)}
-          {((idxX === this.props.game.heroPos.x) && (idxY === this.props.game.heroPos.y)) ?
+          {((idxX === this.props.game.heroPos.c) && (idxY === this.props.game.heroPos.r)) ?
             <div className={this.props.game.heroClass}
               style={{
                 width: `${this.props.cellSize / 5}px`,
