@@ -16,7 +16,7 @@ class GameComponent extends Component {
   constructor() {
     super();
     this.size = {x:12, y:8}
-    this.game = new Game(this.size, 0.7, 15, this.reset.bind(this));
+    this.game = new Game(this.size, 0.7, 15, {x: this.size.x - 1, y: 0}, this.reset.bind(this));
     this.width = document.querySelector('#main').clientWidth;
     this.cellSize = this.width / this.size.x;
     console.log(this.cellSize);

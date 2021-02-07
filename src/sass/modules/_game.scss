@@ -8,11 +8,16 @@
   .game__spot {
     background-color: bisque;
     border-radius: 50%;
-    animation: dissapear;
     animation-fill-mode: forwards;
   }
   .game__hero {
     position: absolute;
     background-color: red;
+  }
+  .game__hero--dead {
+    background-color: rgb(49, 44, 44);
+  }
+  .game__hero--win {
+    background-color: rgb(9, 255, 0);
   }
 }
