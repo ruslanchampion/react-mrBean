@@ -15,9 +15,37 @@
     background-color: red;
   }
   .game__hero--dead {
-    background-color: rgb(49, 44, 44);
+    position: relative;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-color: rgba(255, 0, 0, 0);
+    background-image: url("../assets/img/coffin.gif");
+    width: 150% !important;
+    height: 150% !important;
+    z-index: 100;
+    animation-name: dead;
+    animation-duration: 12s;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
   }
   .game__hero--win {
     background-color: rgb(9, 255, 0);
+  }
+
+  @keyframes dead {
+    from {
+      left: 0;
+      bottom: 0;
+    }
+    90%{
+      opacity: 1;
+    }
+    99% {
+      left: -150px;
+      bottom: -150px;
+    }
+    100% {
+      opacity: 0;
+    }
   }
 }

@@ -24,7 +24,7 @@ class FieldComponent extends Component {
   generateSpot(size) {
     if (size > 0) {
       if (size > 1) {
-       return <div className='game__spot'
+        return <div className='game__spot'
           style={{
             width: `${this.props.cellSize}px`,
             height: `${this.props.cellSize}px`,
@@ -51,12 +51,21 @@ class FieldComponent extends Component {
     return this.props.game.grid.map((row, idxY) =>
       row.map((cell, idxX) =>
         <div className='game__cell' key={`${idxX},${idxY}`}
-          style={{
-            width: `${this.props.cellSize}px`,
-            height: `${this.props.cellSize}px`,
-            top: `${(idxY * this.props.cellSize)}px`,
-            left: `${(idxX * this.props.cellSize)}px`
-          }}>
+          style = {this.props.game.pathGrid[idxY][idxX] ?
+             {
+              width: `${this.props.cellSize}px`,
+              height: `${this.props.cellSize}px`,
+              top: `${(idxY * this.props.cellSize)}px`,
+              left: `${(idxX * this.props.cellSize)}px`,
+              border: '1px solid red'
+            } :
+            {
+              width: `${this.props.cellSize}px`,
+              height: `${this.props.cellSize}px`,
+              top: `${(idxY * this.props.cellSize)}px`,
+              left: `${(idxX * this.props.cellSize)}px`,
+            }
+          }>
           {this.generateSpot(cell)}
           {((idxX === this.props.game.heroPos.c) && (idxY === this.props.game.heroPos.r)) ?
             <div className={this.props.game.heroClass}

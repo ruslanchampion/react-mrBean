@@ -1,7 +1,11 @@
+import Grid from './grid.ts';
+import '../assets/music/coffin.mp3';
+
 class Game {
   size: { r: number, c: number }
   area: number
-  grid: Array<Array<number>>
+  grid: Grid
+  pathGrid: Array<Array<boolean>>
   emptyCells: Array<number>
   filledCells: Array<number>
   fillDensity: number
@@ -10,6 +14,7 @@ class Game {
   winPos: { r: number, c: number }
   heroClass: string
   isActive: boolean
+  onDeadSound: HTMLAudioElement 
   onChange: () => void
 
   constructor(size: { r: number, c: number },
@@ -23,12 +28,65 @@ class Game {
     this.fillDensity = fillDensity;
     this.isActive = true;
     this.winPos = winPos;
+    this.heroPos = { r: this.size.r - 1, c: 0 };
     this.onChange = onChange;
     this.generateGrid();
-    console.log(this.emptyCells);
     this.fillGrid();
-    this.heroPos = { r: this.size.r - 1, c: 0 };
+    this.onDeadSound = new Audio('../assets/music/coffin.mp3');
+    console.log(this.onDeadSound);
     this.heroClass = 'game__hero';
+    console.log(this.grid);
+    this.generatePathGrid();
+  }
+
+  getClosestAccessibleCell(pos: { r: number, c: number }) {
+    let accessabitityTable = this.grid.getAccessibilityTable(pos);
+    return accessabitityTable.reduce((acc, row, r) => {
+      acc = row.reduce((acc, val, c) => {
+        if (val) {
+          if (this.grid.dist({ r, c }, this.winPos) < this.grid.dist(acc, this.winPos)) {
+            acc = { r, c }
+          }
+        }
+        return acc;
+      }, acc)
+      return acc;
+    }, pos);
+  }
+
+  generatePathGrid() {
+    let path = this.getPath();
+    this.pathGrid = Array.from(Array(this.size.r))
+      .map((itm) => Array.from(Array(this.size.c))
+        .map((itm) => false));
+    path.forEach((itm) => {
+      this.pathGrid[itm.r][itm.c] = true;
+    })
+    console.log(this.grid);
+    console.log(path);
+    console.log(this.pathGrid);
+  }
+
+  getPath() {
+    let target = this.getClosestAccessibleCell(this.heroPos);
+    let pos = {
+      r: this.heroPos.r,
+      c: this.heroPos.c
+    }
+    let path = [pos];
+    let distanceTable = this.grid.getDistanceTable(target);
+    console.log(distanceTable);
+    while ((pos.r !== target.r) ||
+      (pos.c !== target.c)) {
+      pos = this.grid.getNeighbors(pos).reduce((acc, neighbor) => {
+        if (distanceTable[neighbor.r][neighbor.c] < distanceTable[acc.r][acc.c]) {
+          acc = neighbor;
+        }
+        return acc
+      }, pos);
+      path.push(pos);
+    }
+    return path;
   }
 
   move(vec: { r: number, c: number }) {
@@ -45,6 +103,7 @@ class Game {
       this.checkIfDead();
       this.checkIfWin();
       console.log(newPos);
+      this.generatePathGrid()
     }
   }
 
@@ -53,6 +112,7 @@ class Game {
       this.isActive = false;
       const className = `${this.heroClass} ${this.heroClass}--dead`;
       this.heroClass = className;
+      this.onDeadSound.play();
       this.onChange();
     }
   }
@@ -75,9 +135,11 @@ class Game {
   }
 
   generateGrid() {
-    this.grid = Array.from(Array(this.size.r))
+    const grid = Array.from(Array(this.size.r))
       .map((itm) => Array.from(Array(this.size.c))
         .map((itm) => 0))
+    console.log(typeof grid);
+    this.grid = new Grid(grid)
     this.emptyCells = this.grid.reduce((acc, itm, r) => {
       acc = acc.concat(itm.reduce((acc, itm, c) => {
         if (itm === 0) {
@@ -134,12 +196,14 @@ class Game {
       let coord: Array<number> = this.keyToCoord(key);
       this.filledCells.push(this.coordToKey(coord));
       this.grid[coord[0]][coord[1]] = size;
+      this.generatePathGrid();
       setTimeout(() => {
         if (this.isActive) {
           this.emptyCells.push(key);
           this.filledCells.splice(this.filledCells.indexOf(key), 1);
           this.grid[coord[0]][coord[1]] = 0;
           this.checkIfDead();
+          this.generatePathGrid();
         }
       }, (size * this.lifeSpan) * 1000)
       const timeToRespawn = ((size * this.lifeSpan) + (Math.random() * this.lifeSpan * 0.5) * ((Math.random() < 0.5) ? -1 : 1)) * 1000;
