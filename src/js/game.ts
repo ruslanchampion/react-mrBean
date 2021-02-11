@@ -5,6 +5,7 @@ class Game {
   size: { r: number, c: number }
   area: number
   grid: Grid
+  fps: number
   pathGrid: Array<Array<boolean>>
   emptyCells: Array<number>
   filledCells: Array<number>
@@ -14,14 +15,20 @@ class Game {
   winPos: { r: number, c: number }
   heroClass: string
   isActive: boolean
-  onDeadSound: HTMLAudioElement 
+  onDeadSound: HTMLAudioElement
+  stepsCounter: number
+  updateInterval: number
+  schedule: {[step: number]: () => void}
   onChange: () => void
 
   constructor(size: { r: number, c: number },
     fillDensity: number,
     lifeSpan: number,
     winPos: { r: number, c: number },
-    onChange: () => void) {
+    onChange: () => void,
+    fps: number = 24) {
+    this.fps = fps;
+    this.stepsCounter = 0;
     this.size = size;
     this.area = size.r * size.c;
     this.lifeSpan = lifeSpan;
@@ -29,14 +36,56 @@ class Game {
     this.isActive = true;
     this.winPos = winPos;
     this.heroPos = { r: this.size.r - 1, c: 0 };
+    this.schedule = {};
     this.onChange = onChange;
     this.generateGrid();
     this.fillGrid();
     this.onDeadSound = new Audio('../assets/music/coffin.mp3');
+    this.onDeadSound.volume = 0.3;
     console.log(this.onDeadSound);
     this.heroClass = 'game__hero';
     console.log(this.grid);
     this.generatePathGrid();
+
+    this.upDate = this.upDate.bind(this);
+    this.updateInterval = window.setInterval(this.upDate, 1000 / fps);
+  }
+
+
+
+  upDate() {
+    this.stepsCounter += 1;
+    for (let r in this.grid) {
+      const row = this.grid[r];
+      for (let c in row) {
+        let val = row[c];
+        if ((val > 0) && (val <= 1)) {
+          val -= (1 / (this.lifeSpan * this.fps));
+          if (val <= 0) {
+            this.onCellDie({r: Number(r), c: Number(c)});
+            val = 0;
+          }
+          this.grid[r][c] = val;
+        }
+      }
+    }
+    const action = this.schedule[this.stepsCounter];
+    if(action) {
+      action();
+      delete this.schedule[this.stepsCounter];
+    }
+    this.onChange();
+  }
+
+  onCellDie(pos: { r: number, c: number }) {
+    if (this.isActive) {
+      const key = this.posToKey(pos);
+      this.emptyCells.push(key);
+      this.filledCells.splice(this.filledCells.indexOf(key), 1);
+      this.grid[pos.r][pos.c] = 0;
+      this.checkIfDead();
+      this.generatePathGrid();
+    }
   }
 
   getClosestAccessibleCell(pos: { r: number, c: number }) {
@@ -62,9 +111,6 @@ class Game {
     path.forEach((itm) => {
       this.pathGrid[itm.r][itm.c] = true;
     })
-    console.log(this.grid);
-    console.log(path);
-    console.log(this.pathGrid);
   }
 
   getPath() {
@@ -75,7 +121,6 @@ class Game {
     }
     let path = [pos];
     let distanceTable = this.grid.getDistanceTable(target);
-    console.log(distanceTable);
     while ((pos.r !== target.r) ||
       (pos.c !== target.c)) {
       pos = this.grid.getNeighbors(pos).reduce((acc, neighbor) => {
@@ -114,6 +159,7 @@ class Game {
       this.heroClass = className;
       this.onDeadSound.play();
       this.onChange();
+      clearInterval(this.updateInterval);
     }
   }
 
@@ -123,6 +169,7 @@ class Game {
       const className = `${this.heroClass} ${this.heroClass}--win`;
       this.heroClass = className;
       this.onChange();
+      clearInterval(this.updateInterval);
     }
   }
 
@@ -132,6 +179,10 @@ class Game {
 
   coordToKey(coord: Array<number>) {
     return (coord[1] + (coord[0] * this.size.c))
+  }
+
+  posToKey(pos: { r: number, c: number }) {
+    return (pos.c + (pos.r * this.size.c))
   }
 
   generateGrid() {
@@ -197,17 +248,10 @@ class Game {
       this.filledCells.push(this.coordToKey(coord));
       this.grid[coord[0]][coord[1]] = size;
       this.generatePathGrid();
-      setTimeout(() => {
-        if (this.isActive) {
-          this.emptyCells.push(key);
-          this.filledCells.splice(this.filledCells.indexOf(key), 1);
-          this.grid[coord[0]][coord[1]] = 0;
-          this.checkIfDead();
-          this.generatePathGrid();
-        }
-      }, (size * this.lifeSpan) * 1000)
-      const timeToRespawn = ((size * this.lifeSpan) + (Math.random() * this.lifeSpan * 0.5) * ((Math.random() < 0.5) ? -1 : 1)) * 1000;
-      setTimeout(() => this.spawnSpot(1), (size * this.lifeSpan) * 1000);
+      //const timeToRespawn = ((size * this.lifeSpan) + (Math.random() * this.lifeSpan * 0.5) * ((Math.random() < 0.5) ? -1 : 1)) * 1000;
+      //setTimeout(() => this.spawnSpot(1), (size * this.lifeSpan) * 1000);
+      const stepsToRespawn = Math.floor(this.stepsCounter + (size * this.lifeSpan) * this.fps);
+      this.schedule[stepsToRespawn] = () => this.spawnSpot(1);
       this.onChange();
     }
   }

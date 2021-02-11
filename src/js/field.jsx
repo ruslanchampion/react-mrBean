@@ -35,9 +35,6 @@ class FieldComponent extends Component {
           style={{
             width: `${size * this.props.cellSize}px`,
             height: `${size * this.props.cellSize}px`,
-            animation: 'dissapear',
-            animationDuration: `${(size * this.props.game.lifeSpan)}s`,
-            animationPlayState: (this.props.game.isActive) ? 'running' : 'paused',
           }}>
         </div>
       }

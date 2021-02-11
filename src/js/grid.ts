@@ -42,7 +42,6 @@ class Grid extends Array<Array<number>>{
     let visitedTable = this.map((row) => {
       return row.map((val) => false)
     });
-    console.log(distanceTable);
     let queue = [start];
     distanceTable[start.r][start.c] = 0;
     let cDist;
@@ -61,7 +60,6 @@ class Grid extends Array<Array<number>>{
         }               
       })
     }
-    console.log(distanceTable);
     return distanceTable;
   }
 

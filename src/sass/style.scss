@@ -1,4 +1,6 @@
 @use './modules/game';
+@use './modules/menu';
+@use './modules/header';
 
 body {
   margin: 0px;
@@ -8,5 +10,6 @@ body {
 #main {
   position: relative;
   width: 80%;
+  height: 100vh;
   margin: auto;
 }
