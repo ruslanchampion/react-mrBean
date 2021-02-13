@@ -67,8 +67,7 @@ class FieldComponent extends Component {
           {((idxX === this.props.game.heroPos.c) && (idxY === this.props.game.heroPos.r)) ?
             <div className={this.props.game.heroClass}
               style={{
-                width: `${this.props.cellSize / 5}px`,
-                height: `${this.props.cellSize / 2}px`
+
               }}
             ></div> :
             null

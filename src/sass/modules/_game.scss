@@ -13,21 +13,33 @@
   }
   .game__hero {
     position: absolute;
-    background-color: red;
+    width: 50%;
+    height: 50%;
+    bottom: 40%;
+    background-image: url('../assets/img/nerd.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    animation-name: dance;
+    animation-duration: 0.8s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    outline: 1px solid transparent;
   }
   .game__hero--dead {
     position: relative;
+    width: 150%;
+    height: 150%;
     background-size: contain;
     background-repeat: no-repeat;
     background-color: rgba(255, 0, 0, 0);
     background-image: url("../assets/img/coffin.gif");
-    width: 150% !important;
-    height: 150% !important;
+
     z-index: 100;
     animation-name: dead;
     animation-duration: 12s;
     animation-timing-function: linear;
     animation-fill-mode: forwards;
+    animation-iteration-count: 1;
   }
   .game__hero--win {
     background-color: rgb(9, 255, 0);
@@ -37,16 +49,48 @@
     from {
       left: 0;
       bottom: 0;
+      width: 150%;
+      height: 150%;
     }
     90%{
       opacity: 1;
-    }
-    99% {
+      transform: scale(1.5);
       left: -150px;
       bottom: -150px;
     }
+    99% {
+      left: -150px;
+      bottom: -500px;
+    }
     100% {
       opacity: 0;
+    }
+  }
+
+  @keyframes dance {
+    0% {
+      transform: scaleX(1);
+      bottom: 40%;
+    }
+    50% {
+      transform: scaleX(0.8);
+      bottom: 30%;
+    }
+    100% {
+      transform: scaleX(1);
+      bottom: 40%;
+    }
+  }
+
+  @keyframes jump {
+    0% {
+      bottom: 40%;
+    }
+    50% {
+      bottom: 30%;
+    }
+    100% {
+      bottom: 40%;
     }
   }
 }
