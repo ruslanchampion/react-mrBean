@@ -19,12 +19,17 @@
     background-image: url('../assets/img/nerd.png');
     background-size: contain;
     background-repeat: no-repeat;
+
+  }
+
+  .game__hero--active {
     animation-name: dance;
     animation-duration: 0.8s;
     animation-timing-function: linear;
     animation-iteration-count: infinite;
     outline: 1px solid transparent;
   }
+
   .game__hero--dead {
     position: relative;
     width: 150%;

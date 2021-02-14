@@ -9,6 +9,11 @@ class Menu extends Component {
     }
   }
   toggle() {
+    if(this.state.opened) {
+      this.props.onHide();
+    } else {
+      this.props.onShow();
+    }
     this.setState({
       opened: !this.state.opened
     })

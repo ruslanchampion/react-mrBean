@@ -15,10 +15,11 @@ class Game {
   winPos: { r: number, c: number }
   heroClass: string
   isActive: boolean
+  onPause: boolean
   onDeadSound: HTMLAudioElement
   stepsCounter: number
   updateInterval: number
-  schedule: {[step: number]: () => void}
+  schedule: { [step: number]: () => void }
   onChange: () => void
 
   constructor(size: { r: number, c: number },
@@ -33,6 +34,7 @@ class Game {
     this.area = size.r * size.c;
     this.lifeSpan = lifeSpan;
     this.fillDensity = fillDensity;
+    this.onPause = false;
     this.isActive = true;
     this.winPos = winPos;
     this.heroPos = { r: this.size.r - 1, c: 0 };
@@ -43,15 +45,27 @@ class Game {
     this.onDeadSound = new Audio('../assets/music/coffin.mp3');
     this.onDeadSound.volume = 0.3;
     console.log(this.onDeadSound);
-    this.heroClass = 'game__hero';
+    this.heroClass = 'game__hero game__hero--active';
     console.log(this.grid);
     this.generatePathGrid();
 
     this.upDate = this.upDate.bind(this);
-    this.updateInterval = window.setInterval(this.upDate, 1000 / fps);
+    this.updateInterval = window.setInterval(this.upDate, 1000 / this.fps);
   }
 
+  pause() {
+    clearInterval(this.updateInterval);
+    this.onPause = true;
+    this.heroClass = 'game__hero';
+    this.onChange();
+  }
 
+  play() {
+    this.updateInterval = window.setInterval(this.upDate, 1000 / this.fps);
+    this.onPause = false;
+    this.heroClass = 'game__hero game__hero--active';
+    this.onChange;
+  }
 
   upDate() {
     this.stepsCounter += 1;
@@ -62,7 +76,7 @@ class Game {
         if ((val > 0) && (val <= 1)) {
           val -= (1 / (this.lifeSpan * this.fps));
           if (val <= 0) {
-            this.onCellDie({r: Number(r), c: Number(c)});
+            this.onCellDie({ r: Number(r), c: Number(c) });
             val = 0;
           }
           this.grid[r][c] = val;
@@ -70,7 +84,7 @@ class Game {
       }
     }
     const action = this.schedule[this.stepsCounter];
-    if(action) {
+    if (action) {
       action();
       delete this.schedule[this.stepsCounter];
     }

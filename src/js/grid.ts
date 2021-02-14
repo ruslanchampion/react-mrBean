@@ -44,7 +44,7 @@ class Grid extends Array<Array<number>>{
     });
     let queue = [start];
     distanceTable[start.r][start.c] = 0;
-    let cDist;
+    let cDist: number;
     while (queue.length > 0) {
       let cCell = queue.pop(); 
       visitedTable[cCell.r][cCell.c] = true;
