@@ -14,6 +14,7 @@ class Game {
   heroPos: { r: number, c: number }
   winPos: { r: number, c: number }
   heroClass: string
+  heroClasses: Set<string>
   isActive: boolean
   onPause: boolean
   onDeadSound: HTMLAudioElement
@@ -29,7 +30,6 @@ class Game {
     onChange: () => void,
     fps: number = 24) {
     this.fps = fps;
-    this.stepsCounter = 0;
     this.size = size;
     this.area = size.r * size.c;
     this.lifeSpan = lifeSpan;
@@ -38,33 +38,60 @@ class Game {
     this.isActive = true;
     this.winPos = winPos;
     this.heroPos = { r: this.size.r - 1, c: 0 };
-    this.schedule = {};
     this.onChange = onChange;
-    this.generateGrid();
-    this.fillGrid();
+    this.newGame();
     this.onDeadSound = new Audio('../assets/music/coffin.mp3');
     this.onDeadSound.volume = 0.3;
     console.log(this.onDeadSound);
+    this.heroClasses = new Set(['game__hero', 'game__hero--active']);
     this.heroClass = 'game__hero game__hero--active';
-    console.log(this.grid);
-    this.generatePathGrid();
-
+    console.log(this.grid);    
     this.upDate = this.upDate.bind(this);
     this.updateInterval = window.setInterval(this.upDate, 1000 / this.fps);
+  }
+
+  newGame() {
+    this.schedule = {};
+    this.isActive = true;
+    this.stepsCounter = 0;
+    this.generateGrid();
+    this.fillGrid();
+    this.heroPos = { r: this.size.r - 1, c: 0 };
+    this.generatePathGrid();
+    this.heroClasses = new Set(['game__hero', 'game__hero--active']);
+    if (this.isActive) {
+      this.heroClass = 'game__hero game__hero--active';
+    } else {
+      this.heroClass = 'game__hero';
+    }
+    this.onChange();
   }
 
   pause() {
     clearInterval(this.updateInterval);
     this.onPause = true;
-    this.heroClass = 'game__hero';
+    this.heroClasses.add('game__hero--paused');
+    if (this.isActive) {
+      this.heroClass = 'game__hero';
+    }
     this.onChange();
   }
 
   play() {
     this.updateInterval = window.setInterval(this.upDate, 1000 / this.fps);
     this.onPause = false;
-    this.heroClass = 'game__hero game__hero--active';
+    this.heroClasses.delete('game__hero--paused');
+    if (this.isActive) {
+      this.heroClass = 'game__hero game__hero--active';
+    }
     this.onChange;
+  }
+
+  getHeroClass() {
+    return Array.from(this.heroClasses).reduce((acc, itm) => {
+      acc.push(itm);
+      return acc;
+    }, [] ).join(' ');
   }
 
   upDate() {
@@ -169,7 +196,7 @@ class Game {
   checkIfDead() {
     if (this.grid[this.heroPos.r][this.heroPos.c] === 0) {
       this.isActive = false;
-      const className = `${this.heroClass} ${this.heroClass}--dead`;
+      const className = 'game__hero game__hero--dead';
       this.heroClass = className;
       this.onDeadSound.play();
       this.onChange();
@@ -180,7 +207,7 @@ class Game {
   checkIfWin() {
     if ((this.heroPos.r === this.winPos.r) && (this.heroPos.c === this.winPos.c)) {
       this.isActive = false;
-      const className = `${this.heroClass} ${this.heroClass}--win`;
+      const className = 'game__hero game__hero--win';
       this.heroClass = className;
       this.onChange();
       clearInterval(this.updateInterval);

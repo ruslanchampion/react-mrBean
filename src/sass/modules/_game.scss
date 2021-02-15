@@ -19,7 +19,10 @@
     background-image: url('../assets/img/nerd.png');
     background-size: contain;
     background-repeat: no-repeat;
+  }
 
+  .game__hero--paused {
+    animation-play-state: paused;
   }
 
   .game__hero--active {

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import MenuMainView from './menuMainView.jsx';
 
 class Menu extends Component {
   constructor(props) {
@@ -22,7 +23,7 @@ class Menu extends Component {
   render() {
     return <div className={(this.state.opened) ? 'menu-container' : 'menu-container menu-container--hidden'}>
       <div className='menu'>
-        <div>menu</div>
+        <MenuMainView game = {this.props.game}/>
         <div className='menu__toggle' onClick={this.toggle}>close</div>
       </div>
     </div>

@@ -45,7 +45,7 @@ class GameComponent extends Component {
     return <Fragment>
       <div className='header'></div>
       <FieldComponent cellSize={this.cellSize} game={this.state.game} />
-      <Menu onShow = {() => this.game.pause()} onHide = {() => this.game.play()}/>
+      <Menu game = {this.game} onShow = {() => this.game.pause()} onHide = {() => this.game.play()}/>
     </Fragment>
   }
 }

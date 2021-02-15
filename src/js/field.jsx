@@ -65,7 +65,7 @@ class FieldComponent extends Component {
           }>
           {this.generateSpot(cell)}
           {((idxX === this.props.game.heroPos.c) && (idxY === this.props.game.heroPos.r)) ?
-            <div className={this.props.game.heroClass}
+            <div className={this.props.game.getHeroClass()}
               style={{
 
               }}
