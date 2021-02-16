@@ -1,5 +1,15 @@
 import Grid from './grid.ts';
 import '../assets/music/coffin.mp3';
+import '../assets/music/main.mp3';
+
+interface GameInterface {
+  size: { r: number, c: number },
+  fillDensity: number,
+  lifeSpan: number,
+  winPos: { r: number, c: number },
+  onChange: () => void,
+  fps?: number
+}
 
 class Game {
   size: { r: number, c: number }
@@ -16,6 +26,7 @@ class Game {
   heroClass: string
   heroClasses: Set<string>
   isActive: boolean
+  sound: HTMLAudioElement
   onPause: boolean
   onDeadSound: HTMLAudioElement
   stepsCounter: number
@@ -23,12 +34,14 @@ class Game {
   schedule: { [step: number]: () => void }
   onChange: () => void
 
-  constructor(size: { r: number, c: number },
-    fillDensity: number,
-    lifeSpan: number,
-    winPos: { r: number, c: number },
-    onChange: () => void,
-    fps: number = 24) {
+  constructor({
+    size,
+    fillDensity,
+    lifeSpan,
+    winPos,
+    onChange,
+    fps = 24
+  }: GameInterface) {
     this.fps = fps;
     this.size = size;
     this.area = size.r * size.c;
@@ -45,12 +58,18 @@ class Game {
     console.log(this.onDeadSound);
     this.heroClasses = new Set(['game__hero', 'game__hero--active']);
     this.heroClass = 'game__hero game__hero--active';
-    console.log(this.grid);    
+    console.log(this.grid);
     this.upDate = this.upDate.bind(this);
     this.updateInterval = window.setInterval(this.upDate, 1000 / this.fps);
   }
 
   newGame() {
+    if(this.sound) {
+      this.sound.pause();
+    }
+    this.sound = new Audio('../assets/music/main.mp3');
+    this.sound.volume = 0.3;
+    this.sound.play();
     this.schedule = {};
     this.isActive = true;
     this.stepsCounter = 0;
@@ -68,30 +87,35 @@ class Game {
   }
 
   pause() {
-    clearInterval(this.updateInterval);
+    if(this.sound) {
+      this.sound.pause();
+    }
     this.onPause = true;
     this.heroClasses.add('game__hero--paused');
     if (this.isActive) {
-      this.heroClass = 'game__hero';
+    clearInterval(this.updateInterval);
     }
     this.onChange();
   }
 
   play() {
-    this.updateInterval = window.setInterval(this.upDate, 1000 / this.fps);
+    if(this.sound) {
+      this.sound.play();
+    }
     this.onPause = false;
     this.heroClasses.delete('game__hero--paused');
+    console.log(this.heroClasses);
     if (this.isActive) {
-      this.heroClass = 'game__hero game__hero--active';
+      this.updateInterval = window.setInterval(this.upDate, 1000 / this.fps);
     }
-    this.onChange;
+    this.onChange();
   }
 
   getHeroClass() {
     return Array.from(this.heroClasses).reduce((acc, itm) => {
       acc.push(itm);
       return acc;
-    }, [] ).join(' ');
+    }, []).join(' ');
   }
 
   upDate() {
@@ -195,9 +219,14 @@ class Game {
 
   checkIfDead() {
     if (this.grid[this.heroPos.r][this.heroPos.c] === 0) {
+      if(this.sound) {
+        this.sound.pause();
+      }
+      this.sound = this.onDeadSound;
+      this.sound.play();
       this.isActive = false;
-      const className = 'game__hero game__hero--dead';
-      this.heroClass = className;
+      this.heroClasses.delete('game__hero--paused');
+      this.heroClasses.add('game__hero--dead');
       this.onDeadSound.play();
       this.onChange();
       clearInterval(this.updateInterval);

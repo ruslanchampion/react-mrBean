@@ -17,15 +17,23 @@ const keysMovement = {
 class GameComponent extends Component {
   constructor() {
     super();
-    this.size = { r: 8, c: 12 }
-    this.game = new Game(this.size, 0.7, 15, { r: 0, c: this.size.c - 1 }, this.reset.bind(this));
+    this.state = {
+      config: {
+        size: { r: 8, c: 12 },
+        fillDensity: 0.75,
+        lifeSpan: 15,
+        winPos: { r: 0, c: 11 },
+        onChange: this.reset.bind(this)
+      }
+    }
+
+
+    this.game = new Game(this.state.config);
     this.width = document.querySelector('#main').clientWidth;
-    this.cellSize = this.width / this.size.c;
+    this.cellSize = this.width / this.state.config.size.c;
     console.log(this.cellSize);
     console.log(this.game);
-    this.state = {
-      game: this.game
-    }
+    this.state.game = this.game;
     document.addEventListener('keydown', (e) => {
       console.log(e.key);
       if (e.key in keysMovement) {
@@ -45,7 +53,7 @@ class GameComponent extends Component {
     return <Fragment>
       <div className='header'></div>
       <FieldComponent cellSize={this.cellSize} game={this.state.game} />
-      <Menu game = {this.game} onShow = {() => this.game.pause()} onHide = {() => this.game.play()}/>
+      <Menu game={this.game} onShow={() => this.game.pause()} onHide={() => this.game.play()} config =  {this.state.config}/>
     </Fragment>
   }
 }

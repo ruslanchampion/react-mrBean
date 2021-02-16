@@ -8,7 +8,7 @@ class MenuMainView extends Component {
   render() {
     return <Fragment>
       <div onClick = {() => {this.props.game.newGame()}}>New game</div>
-      <div>Settings</div>
+      <div onClick = {() => {this.props.route('settings')}}>Settings</div>
       <div>Credits</div>
     </Fragment>
   }
