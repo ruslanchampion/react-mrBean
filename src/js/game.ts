@@ -1,6 +1,7 @@
 import Grid from './grid.ts';
 import '../assets/music/coffin.mp3';
 import '../assets/music/main.mp3';
+import '../assets/music/hop.wav';
 
 interface GameInterface {
   size: { r: number, c: number },
@@ -29,12 +30,30 @@ class Game {
   sound: HTMLAudioElement
   onPause: boolean
   onDeadSound: HTMLAudioElement
+  onMoveSound: HTMLAudioElement
   stepsCounter: number
   updateInterval: number
   schedule: { [step: number]: () => void }
   onChange: () => void
 
-  constructor({
+  constructor(config: GameInterface) {
+    this.setConfig(config);
+    this.onPause = false;
+    this.isActive = true;
+    this.heroPos = { r: this.size.r - 1, c: 0 };
+    this.onDeadSound = new Audio('../assets/music/coffin.mp3');
+    this.onMoveSound = new Audio('../assets/music/hop.wav');
+    this.onMoveSound.volume = 0.6;
+    this.onDeadSound.volume = 0.3;
+    console.log(this.onDeadSound);
+    this.heroClasses = new Set(['game__hero', 'game__hero--active']);
+    this.heroClass = 'game__hero game__hero--active';
+    console.log(this.grid);
+    this.upDate = this.upDate.bind(this);
+    this.newGame();
+  }
+
+  setConfig({
     size,
     fillDensity,
     lifeSpan,
@@ -42,36 +61,29 @@ class Game {
     onChange,
     fps = 24
   }: GameInterface) {
+    if (this.isActive){
+      this.pause();
+    }
     this.fps = fps;
     this.size = size;
     this.area = size.r * size.c;
     this.lifeSpan = lifeSpan;
     this.fillDensity = fillDensity;
-    this.onPause = false;
-    this.isActive = true;
     this.winPos = winPos;
-    this.heroPos = { r: this.size.r - 1, c: 0 };
     this.onChange = onChange;
-    this.newGame();
-    this.onDeadSound = new Audio('../assets/music/coffin.mp3');
-    this.onDeadSound.volume = 0.3;
-    console.log(this.onDeadSound);
-    this.heroClasses = new Set(['game__hero', 'game__hero--active']);
-    this.heroClass = 'game__hero game__hero--active';
-    console.log(this.grid);
-    this.upDate = this.upDate.bind(this);
-    this.updateInterval = window.setInterval(this.upDate, 1000 / this.fps);
   }
 
   newGame() {
-    if(this.sound) {
+    if (this.sound) {
       this.sound.pause();
     }
     this.sound = new Audio('../assets/music/main.mp3');
+    this.sound.autoplay = true;
     this.sound.volume = 0.3;
     this.sound.play();
     this.schedule = {};
     this.isActive = true;
+    this.onPause = false;
     this.stepsCounter = 0;
     this.generateGrid();
     this.fillGrid();
@@ -84,22 +96,25 @@ class Game {
       this.heroClass = 'game__hero';
     }
     this.onChange();
+    clearInterval(this.updateInterval);
+    this.updateInterval = window.setInterval(this.upDate, 1000 / this.fps);
   }
 
   pause() {
-    if(this.sound) {
+    if (this.sound) {
       this.sound.pause();
     }
     this.onPause = true;
     this.heroClasses.add('game__hero--paused');
     if (this.isActive) {
-    clearInterval(this.updateInterval);
+      clearInterval(this.updateInterval);
     }
     this.onChange();
   }
 
   play() {
-    if(this.sound) {
+    if(this.onPause){
+          if (this.sound) {
       this.sound.play();
     }
     this.onPause = false;
@@ -109,6 +124,7 @@ class Game {
       this.updateInterval = window.setInterval(this.upDate, 1000 / this.fps);
     }
     this.onChange();
+    }
   }
 
   getHeroClass() {
@@ -209,6 +225,7 @@ class Game {
         ((newPos.c < this.size.c) && (newPos.c >= 0))) {
         this.heroPos.r = newPos.r;
         this.heroPos.c = newPos.c;
+        this.onMoveSound.play();
       }
       this.checkIfDead();
       this.checkIfWin();
@@ -219,7 +236,7 @@ class Game {
 
   checkIfDead() {
     if (this.grid[this.heroPos.r][this.heroPos.c] === 0) {
-      if(this.sound) {
+      if (this.sound) {
         this.sound.pause();
       }
       this.sound = this.onDeadSound;
@@ -285,7 +302,7 @@ class Game {
     this.spawnPermanentSpot(this.winPos);
     this.spawnSpot(1, this.coordToKey([this.size.r - 1, 0]));
     console.log(this.grid);
-    while (this.filledCells.length < this.fillDensity * this.area) {
+    while (this.filledCells.length < this.fillDensity * (this.emptyCells.length + this.filledCells.length)) {
       this.spawnSpot(1 - (Math.random() * 0.8));
     }
   }

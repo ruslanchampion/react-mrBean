@@ -63,21 +63,29 @@ class FieldComponent extends Component {
               left: `${(idxX * this.props.cellSize)}px`,
             }
           }>
+            {((idxY === this.props.game.winPos.r) && (idxX === this.props.game.winPos.c)) ? 
+            <div className = 'game__finish-cell'></div> : 
+            null}
           {this.generateSpot(cell)}
-          {((idxX === this.props.game.heroPos.c) && (idxY === this.props.game.heroPos.r)) ?
-            <div className={this.props.game.getHeroClass()}
-              style={{
-
-              }}
-            ></div> :
-            null
-          }
         </div>)
     )
+  }
+  generateHero() {
+    return <div className='game__hero-wrapper'
+    style={{
+      width: `${this.props.cellSize}px`,
+      height: `${this.props.cellSize}px`,
+      top: `${(this.props.game.heroPos.r * this.props.cellSize)}px`,
+      left: `${(this.props.game.heroPos.c * this.props.cellSize)}px`,
+    }}
+  >
+    <div className={this.props.game.getHeroClass()}></div>
+  </div>
   }
   render() {
     return <div className='game__field'>
       {this.generateField()}
+      {this.generateHero()}
     </div>
   }
 }

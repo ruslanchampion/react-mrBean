@@ -6,6 +6,16 @@
     align-items: center;
     justify-content: center;
   }
+  .game__finish-cell {
+    position: absolute;
+    top: 0;
+    width: 80%;
+    height: 80%;
+    bottom: 40%;
+    background-image: url("../assets/img/coffee.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
   .game__spot {
     background-color: bisque;
     border-radius: 50%;
@@ -16,9 +26,14 @@
     width: 50%;
     height: 50%;
     bottom: 40%;
-    background-image: url('../assets/img/nerd.png');
+    background-image: url("../assets/img/nerd.png");
     background-size: contain;
     background-repeat: no-repeat;
+  }
+
+  .game__hero-wrapper {
+    @extend .game__cell;
+    transition: all ease 0.3s;
   }
 
   .game__hero--paused {
@@ -60,7 +75,7 @@
       width: 150%;
       height: 150%;
     }
-    90%{
+    90% {
       opacity: 1;
       transform: scale(1.5);
       left: -150px;

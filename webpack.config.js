@@ -40,7 +40,7 @@ module.exports = {
         use: ['style-loader', 'css-loader', 'sass-loader'],
       },
       {
-        test: /\.(png|svg|jpg|jpeg|gif|eot|woff|ttf|mp3)$/i,
+        test: /\.(png|svg|jpg|jpeg|gif|eot|woff|ttf|mp3|wav)$/i,
         loader: 'file-loader',
         options: {
           name: "[path]/[name].[ext]",

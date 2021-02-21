@@ -17,6 +17,7 @@ const keysMovement = {
 class GameComponent extends Component {
   constructor() {
     super();
+    this.setConfig = this.setConfig.bind(this);
     this.state = {
       config: {
         size: { r: 8, c: 12 },
@@ -26,9 +27,8 @@ class GameComponent extends Component {
         onChange: this.reset.bind(this)
       }
     }
-
-
     this.game = new Game(this.state.config);
+    this.game.pause();
     this.width = document.querySelector('#main').clientWidth;
     this.cellSize = this.width / this.state.config.size.c;
     console.log(this.cellSize);
@@ -43,6 +43,22 @@ class GameComponent extends Component {
     })
   }
 
+  setConfig(newConfig) {
+    this.setState({
+      config: newConfig,
+    });
+    this.game.setConfig(newConfig);
+    this.game.newGame();
+    this.setState({
+      game: this.game
+    })
+    this.width = document.querySelector('#main').clientWidth;
+    this.cellSize = this.width / this.state.config.size.c;
+    console.log(this.cellSize);
+    console.log(this.game);
+    this.state.game = this.game;
+  }
+
   reset() {
     this.setState({
       game: this.game
@@ -53,7 +69,12 @@ class GameComponent extends Component {
     return <Fragment>
       <div className='header'></div>
       <FieldComponent cellSize={this.cellSize} game={this.state.game} />
-      <Menu game={this.game} onShow={() => this.game.pause()} onHide={() => this.game.play()} config =  {this.state.config}/>
+      <Menu
+        game={this.game}
+        onShow={() => this.game.pause()}
+        onHide={() => this.game.play()}
+        config={this.state.config}
+        setConfig={this.setConfig} />
     </Fragment>
   }
 }
