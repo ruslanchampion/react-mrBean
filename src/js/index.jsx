@@ -20,6 +20,8 @@ class GameComponent extends Component {
     this.setConfig = this.setConfig.bind(this);
     this.state = {
       config: {
+        musicVolume: 0.5,
+        soundsVolume: 0.5,
         size: { r: 8, c: 12 },
         fillDensity: 0.75,
         lifeSpan: 15,

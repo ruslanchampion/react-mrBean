@@ -4,6 +4,8 @@ import '../assets/music/main.mp3';
 import '../assets/music/hop.wav';
 
 interface GameInterface {
+  musicVolume: number,
+  soundsVolume: number,
   size: { r: number, c: number },
   fillDensity: number,
   lifeSpan: number,
@@ -13,6 +15,8 @@ interface GameInterface {
 }
 
 class Game {
+  musicVolume: number
+  soundsVolume: number
   size: { r: number, c: number }
   area: number
   grid: Grid
@@ -27,7 +31,7 @@ class Game {
   heroClass: string
   heroClasses: Set<string>
   isActive: boolean
-  sound: HTMLAudioElement
+  music: HTMLAudioElement
   onPause: boolean
   onDeadSound: HTMLAudioElement
   onMoveSound: HTMLAudioElement
@@ -43,8 +47,6 @@ class Game {
     this.heroPos = { r: this.size.r - 1, c: 0 };
     this.onDeadSound = new Audio('../assets/music/coffin.mp3');
     this.onMoveSound = new Audio('../assets/music/hop.wav');
-    this.onMoveSound.volume = 0.6;
-    this.onDeadSound.volume = 0.3;
     console.log(this.onDeadSound);
     this.heroClasses = new Set(['game__hero', 'game__hero--active']);
     this.heroClass = 'game__hero game__hero--active';
@@ -54,6 +56,8 @@ class Game {
   }
 
   setConfig({
+    musicVolume,
+    soundsVolume,
     size,
     fillDensity,
     lifeSpan,
@@ -64,6 +68,8 @@ class Game {
     if (this.isActive){
       this.pause();
     }
+    this.musicVolume = musicVolume;
+    this.soundsVolume = soundsVolume;
     this.fps = fps;
     this.size = size;
     this.area = size.r * size.c;
@@ -74,13 +80,15 @@ class Game {
   }
 
   newGame() {
-    if (this.sound) {
-      this.sound.pause();
+    if (this.music) {
+      this.music.pause();
     }
-    this.sound = new Audio('../assets/music/main.mp3');
-    this.sound.autoplay = true;
-    this.sound.volume = 0.3;
-    this.sound.play();
+    this.onMoveSound.volume = this.soundsVolume;
+    this.onDeadSound.volume = this.soundsVolume / 2;
+    this.music = new Audio('../assets/music/main.mp3');
+    this.music.autoplay = true;
+    this.music.volume = this.musicVolume;
+    this.music.play();
     this.schedule = {};
     this.isActive = true;
     this.onPause = false;
@@ -101,8 +109,8 @@ class Game {
   }
 
   pause() {
-    if (this.sound) {
-      this.sound.pause();
+    if (this.music) {
+      this.music.pause();
     }
     this.onPause = true;
     this.heroClasses.add('game__hero--paused');
@@ -114,8 +122,8 @@ class Game {
 
   play() {
     if(this.onPause){
-          if (this.sound) {
-      this.sound.play();
+          if (this.music) {
+      this.music.play();
     }
     this.onPause = false;
     this.heroClasses.delete('game__hero--paused');
@@ -236,11 +244,11 @@ class Game {
 
   checkIfDead() {
     if (this.grid[this.heroPos.r][this.heroPos.c] === 0) {
-      if (this.sound) {
-        this.sound.pause();
+      if (this.music) {
+        this.music.pause();
       }
-      this.sound = this.onDeadSound;
-      this.sound.play();
+      this.music = this.onDeadSound;
+      this.music.play();
       this.isActive = false;
       this.heroClasses.delete('game__hero--paused');
       this.heroClasses.add('game__hero--dead');

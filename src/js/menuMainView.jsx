@@ -11,9 +11,9 @@ class MenuMainView extends Component {
   }
   render() {
     return <Fragment>
-      <div onClick = {this.newGame}>New game</div>
-      <div onClick = {() => {this.props.route('settings')}}>Settings</div>
-      <div>Credits</div>
+      <div className = 'menu__btn' onClick = {this.newGame}>New game</div>
+      <div className = 'menu__btn' onClick = {() => {this.props.route('settings')}}>Settings</div>
+      <div className = 'menu__btn' >Credits</div>
     </Fragment>
   }
 }

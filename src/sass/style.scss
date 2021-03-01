@@ -1,10 +1,12 @@
 @use './modules/game';
 @use './modules/menu';
 @use './modules/header';
+@use './modules/fonts';
 
 body {
   margin: 0px;
   padding: 0px;
+  font-family: 'Rubik';
 }
 
 #main {
