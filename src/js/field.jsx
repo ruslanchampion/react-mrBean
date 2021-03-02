@@ -66,7 +66,7 @@ class FieldComponent extends Component {
             {((idxY === this.props.game.winPos.r) && (idxX === this.props.game.winPos.c)) ? 
             <div className = 'game__finish-cell'></div> : 
             null}
-          {this.generateSpot(cell)}
+          {this.generateSpot(cell.size)}
         </div>)
     )
   }

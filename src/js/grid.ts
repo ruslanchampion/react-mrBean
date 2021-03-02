@@ -1,11 +1,12 @@
-class Grid extends Array<Array<number>>{
+import { cell, cellInterface } from './gameCell.ts';
+class Grid extends Array<Array<cellInterface>>{
   static dirs = [
     { r: -1, c: 0 },
     { r: 1, c: 0 },
     { r: 0, c: 1 },
     { r: 0, c: -1 }
   ]
-  constructor(arr: Array<Array<number>>) {
+  constructor(arr: Array<Array<cellInterface>>) {
     super();
     for (let i in arr){
       super.push(arr[i].slice());
@@ -51,11 +52,11 @@ class Grid extends Array<Array<number>>{
       cDist = distanceTable[cCell.r][cCell.c] + 1
       this.getNeighbors(cCell).forEach((neighbor) => {
         if(!visitedTable[neighbor.r][neighbor.c]
-          && this[neighbor.r][neighbor.c] > 0){
+          && this[neighbor.r][neighbor.c].size > 0){
           queue.push(neighbor);
         }
         if((distanceTable[neighbor.r][neighbor.c] > cDist) && 
-          this[neighbor.r][neighbor.c] > 0){
+          this[neighbor.r][neighbor.c].size > 0){
           distanceTable[neighbor.r][neighbor.c] = cDist;
         }               
       })
@@ -71,7 +72,7 @@ class Grid extends Array<Array<number>>{
     while(queue.length) {
       let cCell = queue.pop();
       this.getNeighbors(cCell).forEach((neighbor) => {
-        if(this[neighbor.r][neighbor.c] > 0){
+        if(this[neighbor.r][neighbor.c].size > 0){
           if(!accessibilityTable[neighbor.r][neighbor.c]){
             accessibilityTable[neighbor.r][neighbor.c] = true;
             queue.push(neighbor);

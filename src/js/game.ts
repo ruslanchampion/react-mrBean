@@ -1,4 +1,5 @@
 import Grid from './grid.ts';
+import { cell, cellInterface } from './gameCell.ts';
 import '../assets/music/coffin.mp3';
 import '../assets/music/main.mp3';
 import '../assets/music/hop.wav';
@@ -147,14 +148,14 @@ class Game {
     for (let r in this.grid) {
       const row = this.grid[r];
       for (let c in row) {
-        let val = row[c];
+        let val = row[c].size;
         if ((val > 0) && (val <= 1)) {
           val -= (1 / (this.lifeSpan * this.fps));
           if (val <= 0) {
             this.onCellDie({ r: Number(r), c: Number(c) });
             val = 0;
           }
-          this.grid[r][c] = val;
+          this.grid[r][c].size = val;
         }
       }
     }
@@ -171,7 +172,8 @@ class Game {
       const key = this.posToKey(pos);
       this.emptyCells.push(key);
       this.filledCells.splice(this.filledCells.indexOf(key), 1);
-      this.grid[pos.r][pos.c] = 0;
+      this.grid[pos.r][pos.c].size = 0;
+      this.grid[pos.r][pos.c].item = 0;
       this.checkIfDead();
       this.generatePathGrid();
     }
@@ -243,7 +245,7 @@ class Game {
   }
 
   checkIfDead() {
-    if (this.grid[this.heroPos.r][this.heroPos.c] === 0) {
+    if (this.grid[this.heroPos.r][this.heroPos.c].size === 0) {
       if (this.music) {
         this.music.pause();
       }
@@ -283,12 +285,12 @@ class Game {
   generateGrid() {
     const grid = Array.from(Array(this.size.r))
       .map((itm) => Array.from(Array(this.size.c))
-        .map((itm) => 0))
+        .map((itm) => cell(0, 0)))
     console.log(typeof grid);
-    this.grid = new Grid(grid)
+    this.grid = new Grid(grid);
     this.emptyCells = this.grid.reduce((acc, itm, r) => {
       acc = acc.concat(itm.reduce((acc, itm, c) => {
-        if (itm === 0) {
+        if (itm.size === 0) {
           acc.push(c + (r * this.size.c))
         }
         return acc
@@ -297,7 +299,7 @@ class Game {
     }, [])
     this.filledCells = this.grid.reduce((acc, itm, r) => {
       acc = acc.concat(itm.reduce((acc, itm, c) => {
-        if (itm === 1) {
+        if (itm.size === 1) {
           acc.push(c + (r * this.size.c))
         }
         return acc
@@ -316,7 +318,7 @@ class Game {
   }
 
   spawnPermanentSpot(pos: { r: number, c: number }) {
-    this.grid[pos.r][pos.c] = 2;
+    this.grid[pos.r][pos.c].size = 2;
     const key = this.coordToKey([pos.r, pos.c]);
     let idx = this.filledCells.indexOf(key);
     if (idx >= 0) {
@@ -341,7 +343,7 @@ class Game {
       }
       let coord: Array<number> = this.keyToCoord(key);
       this.filledCells.push(this.coordToKey(coord));
-      this.grid[coord[0]][coord[1]] = size;
+      this.grid[coord[0]][coord[1]].size = size;
       this.generatePathGrid();
       //const timeToRespawn = ((size * this.lifeSpan) + (Math.random() * this.lifeSpan * 0.5) * ((Math.random() < 0.5) ? -1 : 1)) * 1000;
       //setTimeout(() => this.spawnSpot(1), (size * this.lifeSpan) * 1000);
