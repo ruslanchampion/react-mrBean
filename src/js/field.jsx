@@ -54,7 +54,7 @@ class FieldComponent extends Component {
               height: `${this.props.cellSize}px`,
               top: `${(idxY * this.props.cellSize)}px`,
               left: `${(idxX * this.props.cellSize)}px`,
-              border: '1px solid red'
+              //border: '1px solid red'
             } :
             {
               width: `${this.props.cellSize}px`,
