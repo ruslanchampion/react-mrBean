@@ -235,7 +235,7 @@ class Game {
   }
 
   getScoredCells() {
-    return this.grid.reduce((acc, row, r) => {
+    return this.grid.reduce((acc: Array<{r: number, c: number}>, row: Array<cellInterface>, r: number) => {
       row.forEach((cell, c) => {
         if (cell.content > 0) {
           acc.push({ r, c })
@@ -248,13 +248,13 @@ class Game {
   generateMove() {
     let scoredCells = this.getScoredCells();
     if (scoredCells.length > 0) {
-      let paths = scoredCells.map(cell => this.getPath(cell));
-      let successfullPaths = paths.filter((path, idx) => {
+      let paths = scoredCells.map((cell: {r: number, c: number}) => this.getPath(cell));
+      let successfullPaths = paths.filter((path: Array<{r: number, c: number}>, idx: number) => {
         let target = scoredCells[idx];
         let pathEnd = path[path.length - 1];
         return ((pathEnd.r === target.r) && (pathEnd.c === target.c))
       });
-      successfullPaths.sort((a, b) => a.length - b.length);
+      successfullPaths.sort((a: Array<{r: number, c: number}>, b: Array<{r: number, c: number}>) => a.length - b.length);
       let path;
       if (successfullPaths.length > 0) {
         path = successfullPaths[0];
@@ -285,7 +285,7 @@ class Game {
     let distanceTable = this.grid.getDistanceTable(target);
     while ((pos.r !== target.r) ||
       (pos.c !== target.c)) {
-      pos = this.grid.getNeighbors(pos).reduce((acc, neighbor) => {
+      pos = this.grid.getNeighbors(pos).reduce((acc: {r: number, c: number}, neighbor: {r: number, c: number}) => {
         if (distanceTable[neighbor.r][neighbor.c] < distanceTable[acc.r][acc.c]) {
           acc = neighbor;
         }
@@ -366,7 +366,7 @@ class Game {
       .map((itm) => Array.from(Array(this.size.c))
         .map((itm) => cell(0, 0)))
     this.grid = new Grid(grid);
-    this.emptyCells = this.grid.reduce((acc, itm, r) => {
+    this.emptyCells = this.grid.reduce((acc: Array<number>, itm: Array<cellInterface>, r: number) => {
       acc = acc.concat(itm.reduce((acc, itm, c) => {
         if (itm.size === 0) {
           acc.push(c + (r * this.size.c))
@@ -375,7 +375,7 @@ class Game {
       }, []))
       return acc
     }, [])
-    this.filledCells = this.grid.reduce((acc, itm, r) => {
+    this.filledCells = this.grid.reduce((acc: Array<number>, itm: Array<cellInterface>, r: number) => {
       acc = acc.concat(itm.reduce((acc, itm, c) => {
         if (itm.size === 1) {
           acc.push(c + (r * this.size.c))
