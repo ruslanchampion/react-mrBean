@@ -5,6 +5,7 @@ import '../assets/music/main.mp3';
 import '../assets/music/hop.wav';
 
 interface GameInterface {
+  autoplay: boolean,
   musicVolume: number,
   soundsVolume: number,
   size: { r: number, c: number },
@@ -16,6 +17,8 @@ interface GameInterface {
 }
 
 class Game {
+  score: number
+  autoplay: boolean
   musicVolume: number
   soundsVolume: number
   size: { r: number, c: number }
@@ -27,6 +30,7 @@ class Game {
   filledCells: Array<number>
   fillDensity: number
   lifeSpan: number
+  scoreProbability: number
   heroPos: { r: number, c: number }
   winPos: { r: number, c: number }
   heroClass: string
@@ -48,10 +52,8 @@ class Game {
     this.heroPos = { r: this.size.r - 1, c: 0 };
     this.onDeadSound = new Audio('../assets/music/coffin.mp3');
     this.onMoveSound = new Audio('../assets/music/hop.wav');
-    console.log(this.onDeadSound);
     this.heroClasses = new Set(['game__hero', 'game__hero--active']);
     this.heroClass = 'game__hero game__hero--active';
-    console.log(this.grid);
     this.upDate = this.upDate.bind(this);
     this.newGame();
   }
@@ -66,9 +68,10 @@ class Game {
     onChange,
     fps = 24
   }: GameInterface) {
-    if (this.isActive){
+    if (this.isActive) {
       this.pause();
     }
+
     this.musicVolume = musicVolume;
     this.soundsVolume = soundsVolume;
     this.fps = fps;
@@ -77,10 +80,13 @@ class Game {
     this.lifeSpan = lifeSpan;
     this.fillDensity = fillDensity;
     this.winPos = winPos;
+    this.scoreProbability = 0.1;
     this.onChange = onChange;
   }
 
   newGame() {
+    this.score = 0;
+    this.autoplay = false;
     if (this.music) {
       this.music.pause();
     }
@@ -97,7 +103,7 @@ class Game {
     this.generateGrid();
     this.fillGrid();
     this.heroPos = { r: this.size.r - 1, c: 0 };
-    this.generatePathGrid();
+    this.generateMove();
     this.heroClasses = new Set(['game__hero', 'game__hero--active']);
     if (this.isActive) {
       this.heroClass = 'game__hero game__hero--active';
@@ -107,6 +113,28 @@ class Game {
     this.onChange();
     clearInterval(this.updateInterval);
     this.updateInterval = window.setInterval(this.upDate, 1000 / this.fps);
+  }
+
+  autoPlayStart() {
+    this.autoplay = true;
+    window.setTimeout(() => { this.makeMove() }, 1000)
+  }
+
+  makeMove() {
+    if (this.autoplay) {
+      let target = this.generateMove();
+      console.log('moving to');
+      console.log(target);
+      if (target) {
+        let move = {
+          r: target.r - this.heroPos.r,
+          c: target.c - this.heroPos.c,
+        }        
+        console.log(move);
+        this.move(move);
+      }
+      window.setTimeout(() => { this.makeMove() }, 1000)
+    }
   }
 
   pause() {
@@ -122,17 +150,16 @@ class Game {
   }
 
   play() {
-    if(this.onPause){
-          if (this.music) {
-      this.music.play();
-    }
-    this.onPause = false;
-    this.heroClasses.delete('game__hero--paused');
-    console.log(this.heroClasses);
-    if (this.isActive) {
-      this.updateInterval = window.setInterval(this.upDate, 1000 / this.fps);
-    }
-    this.onChange();
+    if (this.onPause) {
+      if (this.music) {
+        this.music.play();
+      }
+      this.onPause = false;
+      this.heroClasses.delete('game__hero--paused');
+      if (this.isActive) {
+        this.updateInterval = window.setInterval(this.upDate, 1000 / this.fps);
+      }
+      this.onChange();
     }
   }
 
@@ -164,6 +191,9 @@ class Game {
       action();
       delete this.schedule[this.stepsCounter];
     }
+    if (this.autoplay) {
+
+    }
     this.onChange();
   }
 
@@ -173,18 +203,18 @@ class Game {
       this.emptyCells.push(key);
       this.filledCells.splice(this.filledCells.indexOf(key), 1);
       this.grid[pos.r][pos.c].size = 0;
-      this.grid[pos.r][pos.c].item = 0;
+      this.grid[pos.r][pos.c].content = 0;
       this.checkIfDead();
-      this.generatePathGrid();
+      this.generateMove();
     }
   }
 
-  getClosestAccessibleCell(pos: { r: number, c: number }) {
+  getClosestAccessibleCell(pos: { r: number, c: number }, target: { r: number, c: number }) {
     let accessabitityTable = this.grid.getAccessibilityTable(pos);
     return accessabitityTable.reduce((acc, row, r) => {
       acc = row.reduce((acc, val, c) => {
         if (val) {
-          if (this.grid.dist({ r, c }, this.winPos) < this.grid.dist(acc, this.winPos)) {
+          if (this.grid.dist({ r, c }, target) < this.grid.dist(acc, target)) {
             acc = { r, c }
           }
         }
@@ -194,18 +224,49 @@ class Game {
     }, pos);
   }
 
-  generatePathGrid() {
-    let path = this.getPath();
-    this.pathGrid = Array.from(Array(this.size.r))
-      .map((itm) => Array.from(Array(this.size.c))
-        .map((itm) => false));
-    path.forEach((itm) => {
-      this.pathGrid[itm.r][itm.c] = true;
-    })
+  getScoredCells() {
+    return this.grid.reduce((acc, row, r) => {
+      row.forEach((cell, c) => {
+        if (cell.content > 0) {
+          acc.push({ r, c })
+        }
+      })
+      return acc;
+    }, [])
   }
 
-  getPath() {
-    let target = this.getClosestAccessibleCell(this.heroPos);
+  generateMove() {
+    let scoredCells = this.getScoredCells();
+    if (scoredCells.length > 0) {
+      let paths = scoredCells.map(cell => this.getPath(cell));
+      let successfullPaths = paths.filter((path, idx) => {
+        let target = scoredCells[idx];
+        let pathEnd = path[path.length - 1];
+        return ((pathEnd.r === target.r) && (pathEnd.c === target.c))
+      });
+      successfullPaths.sort((a, b) => a.length - b.length);
+      let path;
+      if (successfullPaths.length > 0) {
+        path = successfullPaths[0];
+      } else {
+        scoredCells.sort((a, b) => this.grid.dist(a, this.heroPos) - this.grid.dist(b, this.heroPos));
+        path = this.getPath(scoredCells[0]);
+      }
+      this.pathGrid = Array.from(Array(this.size.r))
+        .map((itm) => Array.from(Array(this.size.c))
+          .map((itm) => false));
+      path.forEach((itm) => {
+        this.pathGrid[itm.r][itm.c] = true;
+      })
+      return path[1];
+    } else {
+      return null;
+    }
+
+  }
+
+  getPath(target: { r: number, c: number }) {
+    target = this.getClosestAccessibleCell(this.heroPos, target);
     let pos = {
       r: this.heroPos.r,
       c: this.heroPos.c
@@ -239,8 +300,8 @@ class Game {
       }
       this.checkIfDead();
       this.checkIfWin();
-      console.log(newPos);
-      this.generatePathGrid()
+      this.checkIfGotScore();
+      this.generateMove();
     }
   }
 
@@ -270,6 +331,14 @@ class Game {
     }
   }
 
+  checkIfGotScore() {
+    let cell = this.grid[this.heroPos.r][this.heroPos.c];
+    if(cell.content === 1) {
+      cell.content = 0;
+      this.score += 500;
+    }
+  }
+
   keyToCoord(key: number) {
     return [(Math.floor(key / this.size.c)), (key - (Math.floor(key / this.size.c) * this.size.c))]
   }
@@ -286,7 +355,6 @@ class Game {
     const grid = Array.from(Array(this.size.r))
       .map((itm) => Array.from(Array(this.size.c))
         .map((itm) => cell(0, 0)))
-    console.log(typeof grid);
     this.grid = new Grid(grid);
     this.emptyCells = this.grid.reduce((acc, itm, r) => {
       acc = acc.concat(itm.reduce((acc, itm, c) => {
@@ -309,9 +377,10 @@ class Game {
   }
 
   fillGrid() {
-    this.spawnPermanentSpot(this.winPos);
+    if (this.winPos.r) {
+      this.spawnPermanentSpot(this.winPos);
+    }
     this.spawnSpot(1, this.coordToKey([this.size.r - 1, 0]));
-    console.log(this.grid);
     while (this.filledCells.length < this.fillDensity * (this.emptyCells.length + this.filledCells.length)) {
       this.spawnSpot(1 - (Math.random() * 0.8));
     }
@@ -343,8 +412,12 @@ class Game {
       }
       let coord: Array<number> = this.keyToCoord(key);
       this.filledCells.push(this.coordToKey(coord));
-      this.grid[coord[0]][coord[1]].size = size;
-      this.generatePathGrid();
+      let cell = this.grid[coord[0]][coord[1]];
+      cell.size = size;
+      if ((Math.random() < this.scoreProbability) && (cell.size > 0.2)) {
+        cell.content = 1;
+      }
+      this.generateMove();
       //const timeToRespawn = ((size * this.lifeSpan) + (Math.random() * this.lifeSpan * 0.5) * ((Math.random() < 0.5) ? -1 : 1)) * 1000;
       //setTimeout(() => this.spawnSpot(1), (size * this.lifeSpan) * 1000);
       const stepsToRespawn = Math.floor(this.stepsCounter + (size * this.lifeSpan) * this.fps);

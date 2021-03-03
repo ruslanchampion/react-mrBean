@@ -7,6 +7,7 @@ class MenuMainView extends Component {
   }
   newGame() {
     this.props.game.newGame();
+    this.props.config.autoplay = 0;
     this.props.close();
   }
   render() {

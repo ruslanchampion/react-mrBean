@@ -16,6 +16,16 @@
     background-size: contain;
     background-repeat: no-repeat;
   }
+  .game__prize-cell {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 50%;
+    bottom: 40%;
+    background-image: url("../assets/img/coffee-cup.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
   .game__spot {
     background-color: bisque;
     border-radius: 50%;

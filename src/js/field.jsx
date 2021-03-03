@@ -48,8 +48,8 @@ class FieldComponent extends Component {
     return this.props.game.grid.map((row, idxY) =>
       row.map((cell, idxX) =>
         <div className='game__cell' key={`${idxX},${idxY}`}
-          style = {this.props.game.pathGrid[idxY][idxX] ?
-             {
+          style={this.props.game.pathGrid[idxY][idxX] ?
+            {
               width: `${this.props.cellSize}px`,
               height: `${this.props.cellSize}px`,
               top: `${(idxY * this.props.cellSize)}px`,
@@ -63,8 +63,11 @@ class FieldComponent extends Component {
               left: `${(idxX * this.props.cellSize)}px`,
             }
           }>
-            {((idxY === this.props.game.winPos.r) && (idxX === this.props.game.winPos.c)) ? 
-            <div className = 'game__finish-cell'></div> : 
+          {((idxY === this.props.game.winPos.r) && (idxX === this.props.game.winPos.c)) ?
+            <div className='game__finish-cell'></div> :
+            null}
+          {(cell.content > 0) ?
+            <div className='game__prize-cell'></div> :
             null}
           {this.generateSpot(cell.size)}
         </div>)
@@ -72,15 +75,15 @@ class FieldComponent extends Component {
   }
   generateHero() {
     return <div className='game__hero-wrapper'
-    style={{
-      width: `${this.props.cellSize}px`,
-      height: `${this.props.cellSize}px`,
-      top: `${(this.props.game.heroPos.r * this.props.cellSize)}px`,
-      left: `${(this.props.game.heroPos.c * this.props.cellSize)}px`,
-    }}
-  >
-    <div className={this.props.game.getHeroClass()}></div>
-  </div>
+      style={{
+        width: `${this.props.cellSize}px`,
+        height: `${this.props.cellSize}px`,
+        top: `${(this.props.game.heroPos.r * this.props.cellSize)}px`,
+        left: `${(this.props.game.heroPos.c * this.props.cellSize)}px`,
+      }}
+    >
+      <div className={this.props.game.getHeroClass()}></div>
+    </div>
   }
   render() {
     return <div className='game__field'>

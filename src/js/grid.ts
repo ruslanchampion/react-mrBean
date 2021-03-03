@@ -52,11 +52,11 @@ class Grid extends Array<Array<cellInterface>>{
       cDist = distanceTable[cCell.r][cCell.c] + 1
       this.getNeighbors(cCell).forEach((neighbor) => {
         if(!visitedTable[neighbor.r][neighbor.c]
-          && this[neighbor.r][neighbor.c].size > 0){
+          && this[neighbor.r][neighbor.c].size > 0.1){
           queue.push(neighbor);
         }
         if((distanceTable[neighbor.r][neighbor.c] > cDist) && 
-          this[neighbor.r][neighbor.c].size > 0){
+          this[neighbor.r][neighbor.c].size > 0.1){
           distanceTable[neighbor.r][neighbor.c] = cDist;
         }               
       })
@@ -72,7 +72,7 @@ class Grid extends Array<Array<cellInterface>>{
     while(queue.length) {
       let cCell = queue.pop();
       this.getNeighbors(cCell).forEach((neighbor) => {
-        if(this[neighbor.r][neighbor.c].size > 0){
+        if(this[neighbor.r][neighbor.c].size > 0.1){
           if(!accessibilityTable[neighbor.r][neighbor.c]){
             accessibilityTable[neighbor.r][neighbor.c] = true;
             queue.push(neighbor);

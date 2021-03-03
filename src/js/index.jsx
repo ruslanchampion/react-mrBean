@@ -20,17 +20,18 @@ class GameComponent extends Component {
     this.setConfig = this.setConfig.bind(this);
     this.state = {
       config: {
-        musicVolume: 0.5,
+        musicVolume: 0.3,
         soundsVolume: 0.5,
         size: { r: 8, c: 12 },
         fillDensity: 0.75,
         lifeSpan: 15,
-        winPos: { r: 0, c: 11 },
+        winPos: { r: null, c: null },
         onChange: this.reset.bind(this)
       }
     }
     this.game = new Game(this.state.config);
-    this.game.pause();
+    //this.game.pause();
+    this.game.autoPlayStart();
     this.width = document.querySelector('#main').clientWidth;
     this.cellSize = this.width / this.state.config.size.c;
     console.log(this.cellSize);
