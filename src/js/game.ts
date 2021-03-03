@@ -94,6 +94,7 @@ class Game {
     this.onDeadSound.volume = this.soundsVolume / 2;
     this.music = new Audio('../assets/music/main.mp3');
     this.music.autoplay = true;
+    this.music.loop = true;
     this.music.volume = this.musicVolume;
     this.music.play();
     this.schedule = {};
@@ -115,6 +116,17 @@ class Game {
     this.updateInterval = window.setInterval(this.upDate, 1000 / this.fps);
   }
 
+  setMusicVolume(volume: number) {
+    this.music.volume = volume;
+    this.musicVolume = volume;
+  }
+
+  setSoundsVolume(volume: number) {    
+    this.soundsVolume = volume;
+    this.onMoveSound.volume = this.soundsVolume;
+    this.onDeadSound.volume = this.soundsVolume / 2;
+  }
+
   autoPlayStart() {
     this.autoplay = true;
     window.setTimeout(() => { this.makeMove() }, 1000)
@@ -123,8 +135,6 @@ class Game {
   makeMove() {
     if (this.autoplay) {
       let target = this.generateMove();
-      console.log('moving to');
-      console.log(target);
       if (target) {
         let move = {
           r: target.r - this.heroPos.r,

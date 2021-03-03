@@ -36,11 +36,23 @@
       background-color: rgb(246, 216, 176);
       cursor: pointer;
     }
+    .h1 {
+      margin-top: 15px;
+      font-size: 24px;
+      font-weight: 400;
+    }
+    .block {
+      margin: 15px 0;
+    }
+    .input-field {
+      margin-left: 10px;
+      width: 50px;
+    }
 }
 
 input[type=range] {
   -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
-  width: 80%; /* Specific width is required for Firefox. */
+  width: 100%; /* Specific width is required for Firefox. */
   margin: 10px 0px;
   background-color: bisque;
   border-radius: 10px;
