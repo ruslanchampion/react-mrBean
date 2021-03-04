@@ -6,6 +6,8 @@ class MenuSettingsView extends Component {
     this.setDensity = this.setDensity.bind(this);
     this.setMusicVolume = this.setMusicVolume.bind(this);
     this.setSoundsVolume = this.setSoundsVolume.bind(this);
+    this.setWidth = this.setWidth.bind(this);
+    this.setHeight = this.setHeight.bind(this);
     this.setConfig = this.setConfig.bind(this);
     this.state = {
       config: this.props.config
@@ -49,6 +51,20 @@ class MenuSettingsView extends Component {
     })
     console.log(this.state)
   }
+  setWidth(e) {
+    this.setState((state) => {
+      const config = state.config;
+      config.size.c = Number(e.target.value);
+      return { config: config }
+    })
+  }
+  setHeight(e) {
+    this.setState((state) => {
+      const config = state.config;
+      config.size.r = Number(e.target.value);
+      return { config: config }
+    })
+  }
   setConfig(config) {
     this.props.setConfig(config);
     this.props.close();
@@ -66,10 +82,10 @@ class MenuSettingsView extends Component {
       </div>
       <div className='h1'>Settings</div>
       <div className='block'>
-        <span>width</span><input className='input-field' defaultValue={this.state.config.size.c} type='number' step='1'></input>
+        <span>width</span><input className='input-field' defaultValue={this.state.config.size.c} type='number' step='1' onChange={this.setWidth}></input>
       </div>
       <div className='block'>
-        <span>height</span><input className='input-field' defaultValue={this.state.config.size.r} type='number' step='1'></input>
+        <span>height</span><input className='input-field' defaultValue={this.state.config.size.r} type='number' step='1' onChange={this.setHeight}></input>
       </div>
       <div className='block'>
         <span>number of spots</span>

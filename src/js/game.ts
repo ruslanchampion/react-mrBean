@@ -18,6 +18,7 @@ interface GameInterface {
 
 class Game {
   score: number
+  autoplayTimeout: number
   autoplay: boolean
   musicVolume: number
   soundsVolume: number
@@ -87,6 +88,7 @@ class Game {
   newGame() {
     this.score = 0;
     this.autoplay = false;
+    this.autoPlayStop();
     if (this.music) {
       this.music.pause();
     }
@@ -128,8 +130,14 @@ class Game {
   }
 
   autoPlayStart() {
+    console.log('autoplay start');
     this.autoplay = true;
-    window.setTimeout(() => { this.makeMove() }, 1000)
+    this.autoplayTimeout = window.setTimeout(() => { this.makeMove() }, 1000)
+  }
+
+  autoPlayStop() {
+    console.log('autoplay stop');
+    window.clearTimeout(this.autoplayTimeout);
   }
 
   makeMove() {
@@ -143,7 +151,7 @@ class Game {
         console.log(move);
         this.move(move);
       }
-      window.setTimeout(() => { this.makeMove() }, 1000)
+      this.autoplayTimeout = window.setTimeout(() => { this.makeMove() }, 1000)
     }
   }
 
@@ -155,7 +163,11 @@ class Game {
     this.heroClasses.add('game__hero--paused');
     if (this.isActive) {
       clearInterval(this.updateInterval);
+      if (this.autoplay) {
+        this.autoPlayStop();
+      }
     }
+    
     this.onChange();
   }
 
@@ -164,11 +176,14 @@ class Game {
       if (this.music) {
         this.music.play();
       }
-      this.onPause = false;
       this.heroClasses.delete('game__hero--paused');
       if (this.isActive) {
         this.updateInterval = window.setInterval(this.upDate, 1000 / this.fps);
+        if (this.autoplay) {
+          this.autoPlayStart();
+        }
       }
+      this.onPause = false;
       this.onChange();
     }
   }
@@ -390,7 +405,10 @@ class Game {
     if (this.winPos.r) {
       this.spawnPermanentSpot(this.winPos);
     }
+    const temp = this.scoreProbability;
+    this.scoreProbability = 0;
     this.spawnSpot(1, this.coordToKey([this.size.r - 1, 0]));
+    this.scoreProbability = temp;
     while (this.filledCells.length < this.fillDensity * (this.emptyCells.length + this.filledCells.length)) {
       this.spawnSpot(1 - (Math.random() * 0.8));
     }

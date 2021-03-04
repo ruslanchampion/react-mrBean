@@ -50,6 +50,7 @@ class GameComponent extends Component {
     this.setState({
       config: newConfig,
     });
+    console.log(newConfig);
     this.game.setConfig(newConfig);
     this.game.newGame();
     this.setState({
