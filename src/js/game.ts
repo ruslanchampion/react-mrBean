@@ -135,13 +135,11 @@ class Game {
   }
 
   autoPlayStart() {
-    console.log('autoplay start');
     this.autoplay = true;
     this.autoplayTimeout = window.setTimeout(() => { this.makeMove() }, 1000)
   }
 
   autoPlayStop() {
-    console.log('autoplay stop');
     window.clearTimeout(this.autoplayTimeout);
   }
 
@@ -153,7 +151,6 @@ class Game {
           r: target.r - this.heroPos.r,
           c: target.c - this.heroPos.c,
         }        
-        console.log(move);
         this.move(move);
       }
       this.autoplayTimeout = window.setTimeout(() => { this.makeMove() }, 1000)

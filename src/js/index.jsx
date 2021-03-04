@@ -30,16 +30,12 @@ class GameComponent extends Component {
       }
     }
     this.game = new Game(this.state.config);
-    //this.game.pause();
     this.game.autoPlayStart();
     this.width = document.querySelector('#main').clientWidth;
     this.height = document.querySelector('#main').clientHeight - 60;
     this.cellSize = Math.min(this.width / this.state.config.size.c, this.height / this.state.config.size.r);
-    console.log(this.cellSize);
-    console.log(this.game);
     this.state.game = this.game;
     document.addEventListener('keydown', (e) => {
-      console.log(e.key);
       if (e.key in keysMovement) {
         this.state.game.move(keysMovement[e.key]);
         this.reset();
@@ -51,7 +47,6 @@ class GameComponent extends Component {
     this.setState({
       config: newConfig,
     });
-    console.log(newConfig);
     this.game.setConfig(newConfig);
     this.game.newGame();
     this.setState({
@@ -60,8 +55,6 @@ class GameComponent extends Component {
     this.width = document.querySelector('#main').clientWidth;
     this.height = document.querySelector('#main').clientHeight - 60;
     this.cellSize = Math.min(this.width / this.state.config.size.c, this.height / this.state.config.size.r);
-    console.log(this.cellSize);
-    console.log(this.game);
     this.state.game = this.game;
   }
 
