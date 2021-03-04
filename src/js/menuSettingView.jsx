@@ -14,42 +14,31 @@ class MenuSettingsView extends Component {
     }
   }
   setDensity(e) {
-    console.log(e.target.value);
-    console.log(e.nativeEvent.target.attributes.value.value);
     this.setState((state) => {
       const config = state.config;
       config.fillDensity = e.target.value / 100;
       return { config: config }
     })
-    console.log(this.state)
   }
   setMusicVolume(e) {
-    console.log(e.target.value);
-    console.log(e.nativeEvent.target.attributes.value.value);
     const key = e.target.name;
     const val = e.target.value / 100;
-    console.log(key);
     this.props.game.setMusicVolume(val);
     this.setState((state) => {
       const config = state.config;
       config[key] = e.target.value / 100;
       return { config: config }
     })
-    console.log(this.state)
   }
   setSoundsVolume(e) {
-    console.log(e.target.value);
-    console.log(e.nativeEvent.target.attributes.value.value);
     const key = e.target.name;
     const val = e.target.value / 100;
-    console.log(key);
     this.props.game.setSoundsVolume(val);
     this.setState((state) => {
       const config = state.config;
       config[key] = val;
       return { config: config }
     })
-    console.log(this.state)
   }
   setWidth(e) {
     this.setState((state) => {

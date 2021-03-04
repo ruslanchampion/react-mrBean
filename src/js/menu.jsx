@@ -27,7 +27,6 @@ class Menu extends Component {
     this.setState({
       opened: !this.state.opened
     })
-    console.log(this.state);
   }
 
   close(){
