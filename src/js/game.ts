@@ -3,6 +3,7 @@ import { cell, cellInterface } from './gameCell.ts';
 import '../assets/music/coffin.mp3';
 import '../assets/music/main.mp3';
 import '../assets/music/hop.wav';
+import '../assets/music/gulp.wav';
 
 interface GameInterface {
   autoplay: boolean,
@@ -41,6 +42,7 @@ class Game {
   onPause: boolean
   onDeadSound: HTMLAudioElement
   onMoveSound: HTMLAudioElement
+  onDrinkSound: HTMLAudioElement
   stepsCounter: number
   updateInterval: number
   schedule: { [step: number]: () => void }
@@ -53,6 +55,7 @@ class Game {
     this.heroPos = { r: this.size.r - 1, c: 0 };
     this.onDeadSound = new Audio('../assets/music/coffin.mp3');
     this.onMoveSound = new Audio('../assets/music/hop.wav');
+    this.onDrinkSound = new Audio('../assets/music/gulp.wav');
     this.heroClasses = new Set(['game__hero', 'game__hero--active']);
     this.heroClass = 'game__hero game__hero--active';
     this.upDate = this.upDate.bind(this);
@@ -94,6 +97,7 @@ class Game {
     }
     this.onMoveSound.volume = this.soundsVolume;
     this.onDeadSound.volume = this.soundsVolume / 2;
+    this.onDrinkSound.volume = this.soundsVolume;
     this.music = new Audio('../assets/music/main.mp3');
     this.music.autoplay = true;
     this.music.loop = true;
@@ -127,6 +131,7 @@ class Game {
     this.soundsVolume = volume;
     this.onMoveSound.volume = this.soundsVolume;
     this.onDeadSound.volume = this.soundsVolume / 2;
+    this.onDrinkSound.volume = this.soundsVolume;
   }
 
   autoPlayStart() {
@@ -322,6 +327,9 @@ class Game {
         this.heroPos.r = newPos.r;
         this.heroPos.c = newPos.c;
         this.onMoveSound.play();
+        if(this.score){
+          this.score -= 1;
+        }        
       }
       this.checkIfDead();
       this.checkIfWin();
@@ -360,7 +368,8 @@ class Game {
     let cell = this.grid[this.heroPos.r][this.heroPos.c];
     if(cell.content === 1) {
       cell.content = 0;
-      this.score += 500;
+      this.score += 20;
+      this.onDrinkSound.play();
     }
   }
 

@@ -33,7 +33,8 @@ class GameComponent extends Component {
     //this.game.pause();
     this.game.autoPlayStart();
     this.width = document.querySelector('#main').clientWidth;
-    this.cellSize = this.width / this.state.config.size.c;
+    this.height = document.querySelector('#main').clientHeight - 60;
+    this.cellSize = Math.min(this.width / this.state.config.size.c, this.height / this.state.config.size.r);
     console.log(this.cellSize);
     console.log(this.game);
     this.state.game = this.game;
@@ -57,7 +58,8 @@ class GameComponent extends Component {
       game: this.game
     })
     this.width = document.querySelector('#main').clientWidth;
-    this.cellSize = this.width / this.state.config.size.c;
+    this.height = document.querySelector('#main').clientHeight - 60;
+    this.cellSize = Math.min(this.width / this.state.config.size.c, this.height / this.state.config.size.r);
     console.log(this.cellSize);
     console.log(this.game);
     this.state.game = this.game;
@@ -71,7 +73,11 @@ class GameComponent extends Component {
 
   render() {
     return <Fragment>
-      <div className='header'></div>
+      <div className='header'>
+        <div className="score">
+         {this.state.game.score} 
+        </div>        
+        </div>
       <FieldComponent cellSize={this.cellSize} game={this.state.game} />
       <Menu
         game={this.game}
