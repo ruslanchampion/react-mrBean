@@ -1,18 +1,129 @@
 .game__field {
+  position: relative;
   .game__cell {
     position: absolute;
     display: flex;
     align-items: center;
     justify-content: center;
   }
+  .game__finish-cell {
+    position: absolute;
+    top: 0;
+    width: 80%;
+    height: 80%;
+    bottom: 40%;
+    background-image: url("../assets/img/coffee.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+  .game__prize-cell {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 50%;
+    bottom: 40%;
+    background-image: url("../assets/img/coffee-cup.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
   .game__spot {
     background-color: bisque;
     border-radius: 50%;
-    animation: dissapear;
     animation-fill-mode: forwards;
   }
   .game__hero {
     position: absolute;
-    background-color: red;
+    width: 50%;
+    height: 50%;
+    bottom: 40%;
+    background-image: url("../assets/img/nerd.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  .game__hero-wrapper {
+    @extend .game__cell;
+    transition: all ease 0.3s;
+  }
+
+  .game__hero--paused {
+    animation-play-state: paused;
+  }
+
+  .game__hero--active {
+    animation-name: dance;
+    animation-duration: 0.8s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    outline: 1px solid transparent;
+  }
+
+  .game__hero--dead {
+    position: relative;
+    width: 150%;
+    height: 150%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-color: rgba(255, 0, 0, 0);
+    background-image: url("../assets/img/coffin.gif");
+
+    z-index: 100;
+    animation-name: dead;
+    animation-duration: 12s;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+    animation-iteration-count: 1;
+  }
+  .game__hero--win {
+    background-color: rgb(9, 255, 0);
+  }
+
+  @keyframes dead {
+    from {
+      left: 0;
+      bottom: 0;
+      width: 150%;
+      height: 150%;
+    }
+    90% {
+      opacity: 1;
+      transform: scale(1.5);
+      left: -150px;
+      bottom: -150px;
+    }
+    99% {
+      left: -150px;
+      bottom: -500px;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes dance {
+    0% {
+      transform: scaleX(1);
+      bottom: 40%;
+    }
+    50% {
+      transform: scaleX(0.8);
+      bottom: 30%;
+    }
+    100% {
+      transform: scaleX(1);
+      bottom: 40%;
+    }
+  }
+
+  @keyframes jump {
+    0% {
+      bottom: 40%;
+    }
+    50% {
+      bottom: 30%;
+    }
+    100% {
+      bottom: 40%;
+    }
   }
 }

@@ -5,7 +5,7 @@ class FieldComponent extends Component {
     super(props);
     let styleSheet = document.styleSheets[0];
     let keyframes =
-    `@-webkit-keyframes dissapear {
+      `@-webkit-keyframes dissapear {
       0% {
 
     }
@@ -20,40 +20,75 @@ class FieldComponent extends Component {
   }`
     styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
   }
+
+  generateSpot(size) {
+    if (size > 0) {
+      if (size > 1) {
+        return <div className='game__spot'
+          style={{
+            width: `${this.props.cellSize}px`,
+            height: `${this.props.cellSize}px`,
+          }}>
+        </div>
+      } else {
+        return <div className='game__spot'
+          style={{
+            width: `${size * this.props.cellSize}px`,
+            height: `${size * this.props.cellSize}px`,
+          }}>
+        </div>
+      }
+    }
+    else {
+      return null;
+    }
+  }
+
   generateField() {
-    return this.props.game.grid.map((col, idxX) =>
-      col.map((cell, idxY) =>
+    return this.props.game.grid.map((row, idxY) =>
+      row.map((cell, idxX) =>
         <div className='game__cell' key={`${idxX},${idxY}`}
-        style={{
-          width: `${this.props.cellSize}px`,
-          height: `${this.props.cellSize}px`,
-          top: `${(idxY * this.props.cellSize)}px`,
-          left: `${(idxX * this.props.cellSize)}px`
-        }}>
-          {(cell > 0) ?
-            <div className='game__spot'
-              style={{
-                width: `${cell * this.props.cellSize}px`,
-                height: `${cell * this.props.cellSize}px`,
-                animationDuration: `${(cell * this.props.game.lifeSpan)}s`,
-              }}>
-            </div> :
-            null}
-            {((idxX === this.props.game.heroPos.x) && (idxY === this.props.game.heroPos.y)) ?
-            <div className='game__hero'
-            style={{
-              width: `${this.props.cellSize / 5}px`,
-              height: `${this.props.cellSize / 2}px`
-            }}
-            ></div> :
-            null
+          style={this.props.game.pathGrid[idxY][idxX] ?
+            {
+              width: `${this.props.cellSize}px`,
+              height: `${this.props.cellSize}px`,
+              top: `${(idxY * this.props.cellSize)}px`,
+              left: `${(idxX * this.props.cellSize)}px`,
+              //border: '1px solid red'
+            } :
+            {
+              width: `${this.props.cellSize}px`,
+              height: `${this.props.cellSize}px`,
+              top: `${(idxY * this.props.cellSize)}px`,
+              left: `${(idxX * this.props.cellSize)}px`,
             }
+          }>
+          {((idxY === this.props.game.winPos.r) && (idxX === this.props.game.winPos.c)) ?
+            <div className='game__finish-cell'></div> :
+            null}
+          {(cell.content > 0) ?
+            <div className='game__prize-cell'></div> :
+            null}
+          {this.generateSpot(cell.size)}
         </div>)
     )
+  }
+  generateHero() {
+    return <div className='game__hero-wrapper'
+      style={{
+        width: `${this.props.cellSize}px`,
+        height: `${this.props.cellSize}px`,
+        top: `${(this.props.game.heroPos.r * this.props.cellSize)}px`,
+        left: `${(this.props.game.heroPos.c * this.props.cellSize)}px`,
+      }}
+    >
+      <div className={this.props.game.getHeroClass()}></div>
+    </div>
   }
   render() {
     return <div className='game__field'>
       {this.generateField()}
+      {this.generateHero()}
     </div>
   }
 }
